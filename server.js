@@ -5,40 +5,35 @@ const path = require('path');
 const app = express();
 
 // Middleware
-app.use(express.static(__dirname));
+app.use(express.static(__dirname));  // Serves your index.html and files
 app.use(express.json());
 
 // Load CSV into memory at startup
-let bankData = [];
+let bankData = []; // Array of { RoutingNumber, BankName, Address, City, State }
 const csvPath = path.join(__dirname, 'data', 'banks.csv');
 
 console.log('Loading CSV from:', csvPath);
 
-let csvLoaded = false;
-
 fs.createReadStream(csvPath)
   .pipe(csv())
   .on('data', (row) => {
-    if (row.RoutingNumber && row.RoutingNumber !== 'RoutingNumber') {
-      bankData.push(row);
-    }
+    bankData.push(row);
   })
   .on('end', () => {
-    csvLoaded = true;
     console.log(`CSV loaded successfully: ${bankData.length} banks.`);
   })
   .on('error', (err) => {
     console.error('CSV loading error:', err.message);
-    bankData = [];
-    csvLoaded = true;
+    bankData = []; // Fallback to empty
   });
 
 // API endpoint to validate
 app.post('/validate', (req, res) => {
-  console.log('Received request:', req.body);
+  console.log('Received request:', req.body); // Log for debugging
 
   const { routingNumber, accountNumber } = req.body;
 
+  // Validate inputs
   if (!routingNumber || !accountNumber) {
     return res.status(400).json({ valid: false, message: 'Missing routing or account number.' });
   }
@@ -51,24 +46,21 @@ app.post('/validate', (req, res) => {
     return res.status(400).json({ valid: false, message: 'Invalid account number format (8-17 digits).' });
   }
 
-  if (!csvLoaded) {
-    return res.status(503).json({ valid: false, message: 'Server still loading data. Try again.' });
-  }
-
+  // Search in loaded data
   const foundBank = bankData.find(row => row.RoutingNumber === routingNumber);
 
   if (foundBank) {
-    console.log('Valid routing found:', foundBank.BankName);
+    console.log('Valid routing found:', foundBank.BankName); // Log success
     res.json({
       valid: true,
       bankName: foundBank.BankName,
       address: `${foundBank.Address}, ${foundBank.City}, ${foundBank.State}`
     });
   } else {
-    console.log('Invalid routing:', routingNumber);
+    console.log('Invalid routing:', routingNumber); // Log failure
     res.json({ valid: false, message: 'Invalid routing number.' });
   }
 });
 
-// For Vercel: Export the app
+// For Vercel: Export the app (removes the listen part)
 module.exports = app;
