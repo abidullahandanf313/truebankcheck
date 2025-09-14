@@ -3,10 +3,9 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const path = require('path');
 const app = express();
-const port = 3000;
 
 // Middleware
-app.use(express.static(__dirname));
+app.use(express.static(__dirname));  // Serves your index.html and files
 app.use(express.json());
 
 // Load CSV into memory at startup
@@ -27,16 +26,6 @@ fs.createReadStream(csvPath)
     console.error('CSV loading error:', err.message);
     bankData = []; // Fallback to empty
   });
-
-// Wait a bit for CSV to load before listening
-setTimeout(() => {
-  app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-    if (bankData.length === 0) {
-      console.warn('Warning: No bank data loaded. Check CSV path/format.');
-    }
-  });
-}, 1000);
 
 // API endpoint to validate
 app.post('/validate', (req, res) => {
@@ -72,3 +61,6 @@ app.post('/validate', (req, res) => {
     res.json({ valid: false, message: 'Invalid routing number.' });
   }
 });
+
+// For Vercel: Export the app (removes the listen part)
+module.exports = app;
