@@ -503,11 +503,11 @@
             accountResultDiv.classList.remove('hidden');
 
             try {
-                const response = await fetch('/validate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ routingNumber: routing, accountNumber: account })
-                });
+                const response = await fetch('/api/validate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ routingNumber: routing, accountNumber: account })
+});
                 const data = await response.json();
 
                 accountSearchingText.classList.add('hidden');
@@ -815,3 +815,4 @@
     </script>
 </body>
 </html>
+
