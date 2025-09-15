@@ -366,7 +366,7 @@
                 </div>
                 
                 <!-- Error Message (fallback for invalid) -->
-                <div id="errorMessage" class="bg-red-900 text-red-200 p-4 rounded-xl text-center font-medium hidden">Not Valid</div>
+                <div id="errorMessage" class="bg-red-900 text-red-200 p-4 rounded-xl text-center font-medium hidden">No Data Found</div>
             </div>
         </div>
     </div>
@@ -594,7 +594,7 @@
                     // Hide table, show error
                     document.getElementById('successTable').classList.add('hidden');
                     document.getElementById('errorMessage').classList.remove('hidden');
-                    document.getElementById('errorMessage').textContent = 'Not Valid';
+                    document.getElementById('errorMessage').textContent = 'No Data Found';
                 }
             } catch (error) {
                 accountSearchingText.classList.add('hidden');
@@ -885,6 +885,7 @@
     </script>
 </body>
 </html>
+
 
 
 
